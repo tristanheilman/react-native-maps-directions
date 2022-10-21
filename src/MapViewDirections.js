@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import MapView from "react-native-maps";
-import isEqual from "lodash.isequal";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Polyline } from 'react-native-maps';
+import isEqual from 'lodash.isequal';
 
 const WAYPOINT_LIMIT = 10;
 
@@ -368,8 +368,11 @@ class MapViewDirections extends Component {
       ...props
     } = this.props;
 
-    return <MapView.Polyline coordinates={coordinates} {...props} />;
-  }
+		return (
+			<Polyline coordinates={coordinates} {...props} />
+		);
+	}
+
 }
 
 MapViewDirections.propTypes = {
