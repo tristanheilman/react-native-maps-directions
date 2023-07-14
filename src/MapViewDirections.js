@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { Polyline } from 'react-native-maps';
-import isEqual from 'lodash.isequal';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { Polyline } from "react-native-maps";
+import isEqual from "lodash.isequal";
 
 const WAYPOINT_LIMIT = 10;
 
@@ -14,9 +14,12 @@ class MapViewDirections extends Component {
       distance: null,
       duration: null,
     };
+
+    this.mountedRef = React.createRef(false);
   }
 
   componentDidMount() {
+    this.mountedRef.current = true;
     this.fetchAndRenderRoute(this.props);
   }
 
@@ -40,15 +43,21 @@ class MapViewDirections extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.mountedRef.current = false;
+  }
+
   resetState = (cb = null) => {
-    this.setState(
-      {
-        coordinates: null,
-        distance: null,
-        duration: null,
-      },
-      cb
-    );
+    if (this.mountedRef.current) {
+      this.setState(
+        {
+          coordinates: null,
+          distance: null,
+          duration: null,
+        },
+        cb
+      );
+    }
   };
 
   decode(t) {
@@ -254,16 +263,18 @@ class MapViewDirections extends Component {
         );
 
         // Plot it out and call the onReady callback
-        this.setState(
-          {
-            coordinates: result.coordinates,
-          },
-          function () {
-            if (onReady) {
-              onReady(result);
+        if (this.mountedRef.current) {
+          this.setState(
+            {
+              coordinates: result.coordinates,
+            },
+            function () {
+              if (onReady) {
+                onReady(result);
+              }
             }
-          }
-        );
+          );
+        }
       })
       .catch((errorMessage) => {
         this.resetState();
@@ -368,11 +379,8 @@ class MapViewDirections extends Component {
       ...props
     } = this.props;
 
-		return (
-			<Polyline coordinates={coordinates} {...props} />
-		);
-	}
-
+    return <Polyline coordinates={coordinates} {...props} />;
+  }
 }
 
 MapViewDirections.propTypes = {
